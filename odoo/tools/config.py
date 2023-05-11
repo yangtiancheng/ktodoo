@@ -393,6 +393,7 @@ class configmanager(object):
 
         self.rcfile = os.path.abspath(
             self.config_file or opt.config or os.environ.get('ODOO_RC') or os.environ.get('OPENERP_SERVER') or rcfilepath)
+        # 加载odoo.conf配置文件中的参数值
         self.load()
 
         # Verify that we want to log or not, if not the output will go to stdout
@@ -509,6 +510,9 @@ class configmanager(object):
         ]
 
     def _is_addons_path(self, path):
+        # 检查addons下的没有个module是否有__init__.py方法和__manifest__方法
+        # 这是一种基础的检测，判断addons下的文件夹是否是有module必要的文件结构
+        # 进而确认是否是一个addons目录
         from odoo.modules.module import MANIFEST_NAMES
         for f in os.listdir(path):
             modpath = os.path.join(path, f)
@@ -523,10 +527,13 @@ class configmanager(object):
         ad_paths = []
         for path in value.split(','):
             path = path.strip()
+            # expanduser将~转换为全路径
             res = os.path.abspath(os.path.expanduser(path))
             if not os.path.isdir(res):
+                # 路径是否是文件夹
                 raise optparse.OptionValueError("option %s: no such directory: %r" % (opt, path))
             if not self._is_addons_path(res):
+                # 是否包含module，包含才是addons路径
                 raise optparse.OptionValueError("option %s: The addons-path %r does not seem to a be a valid Addons Directory!" % (opt, path))
             ad_paths.append(res)
 

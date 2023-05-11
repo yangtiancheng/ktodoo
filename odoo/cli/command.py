@@ -9,15 +9,32 @@ from odoo.modules import get_modules, get_module_path
 
 commands = {}
 
+
+# 自定义一个元类 CommandType
 class CommandType(type):
+    """
+    自定义元类CommandType
+    """
+
     def __init__(cls, name, bases, attrs):
+        # 继承type元类的基本功能
         super(CommandType, cls).__init__(name, bases, attrs)
+        # 扩展元类额外功能 -增加了一个name属性（来自class的lower字符串）、并将类加入全局commands参数中
         name = getattr(cls, name, cls.__name__.lower())
         cls.name = name
         if name != 'command':
             commands[name] = cls
 
+
+# 调用自定义元类CommandType 并返回一个Command类
+# 默认一个run的抽象方法 接收self, args两个参数，后面继承类可以重写
+# 用元类定义的run方法
 Command = CommandType('Command', (object,), {'run': lambda self, args: None})
+# 功能同下：
+# class Command(object, metaclass=CommandType):
+#     def run(self, args):
+#         return None
+
 
 class Help(Command):
     """Display the list of available commands"""

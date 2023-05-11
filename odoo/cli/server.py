@@ -120,8 +120,10 @@ def import_translation():
             )
 
 def main(args):
+    # linux系统时，用户是root提示不退出
     check_root_user()
     odoo.tools.config.parse_config(args)
+    # 配置文件db_user如果是root，提示并退出
     check_postgres_user()
     report_configuration()
 
